@@ -1,145 +1,129 @@
 import gql from 'graphql-tag'
-import Link from 'next/link'
 import Head from 'next/head'
-import { useQuery } from '@apollo/client'
+import { useQuery, useMutation } from '@apollo/client'
 import { initializeApollo } from '../apollo/client'
-import { useEffect, useState } from 'react';
-import { TextField, Button, List, ListItem, IconButton, ListItemButton, CircularProgress } from '@mui/material';
+import { useState } from 'react';
+import { Button, ListItem, IconButton, ListItemButton, CircularProgress, Dialog, DialogTitle, DialogActions, Divider } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import EditIcon from '@mui/icons-material/Edit';
-import BackupIcon from '@mui/icons-material/Backup';
-import { Title, CheckIcon, ListItemText, Input } from './style'
+import { Title, Content, CheckIcon, ListItemText, List, TextField, CusButton } from './style'
+import { ADD_TODO, GET_TODOS, EDIT_TODOS, DELETE_TODO } from './api/todos';
 
-const ViewerQuery = gql`
-  query ViewerQuery {
-    viewer {
-      id
-      status
-      text
-    }
-  }
-`
 
 const Index = () => {
 
-  const {
-    loading,
-    data: { viewer },
-  } = useQuery(ViewerQuery)
+  const { loading, data: { getTodos } } = useQuery(GET_TODOS)
+  const [addTodo] = useMutation(ADD_TODO, {
+    onCompleted: () => setInputValue('')
+  })
+  const [editTodo] = useMutation(EDIT_TODOS);
+  const [deleteTodo] = useMutation(DELETE_TODO);
 
+  const [inputValue, setInputValue] = useState('') // 輸入欄
+  const [dialogStatus, setDialogStatus] = useState(false);
+  const [nowDeleteData, setnowDeleteData] = useState(null)
 
-
-  const [inputValue, setInputValue] = useState('')
-  const [viewList, setViewList] = useState([{ text: 'bar', status: 0 }, { text: 'foo', status: 1 }, { text: 'baz', status: 0} ])
-  const [inputStatus, setInputStatus] = useState('add')
-  
-  useEffect(()=>{
-    console.log('effect on viewer',viewer);
-    setViewList(viewer)
-  },[viewer])
-
-  useEffect(()=>{
-    console.log('loading effect ',loading);
-  },[loading])
-
-  /** 新增 */
-  const addItem = () => {
-    setViewList(arr => [...arr,{ text: inputValue, status:0 }]);
+  /** 新增一筆todos */
+  const addTodoApi = async () => {
+    if(!inputValue) return 
+    await addTodo({ 
+      variables: { input: { text: inputValue.trim() , status: 0 } },
+      refetchQueries: [
+        { query: GET_TODOS }
+      ]
+    });
   }
 
-  /** 
-   * @param {Number} - idx index
-   * @param {String} - text 顯示文字
-   * @param {String} - action 刪除或編輯
-   * 修改 刪除 */
-  const itemClick = (idx,action,text) => {
-    if(action === 'delete'){
-      console.log('in delete',idx);
-      return
-    }
-    if(action === 'edit'){
-      console.log('in edit',text);
-      setViewList(
-        viewList.map((item,index) => 
-            idx === index 
-            ? {...item, isEdit : !item.isEdit } 
-            : {...item, isEdit : !!item.isEdit } 
-      ))
-      //todo 在查詢新資料
-      return
+  /** 修改todos狀態 */
+  const editTodoHandler = async ({id,status}) => {
+    await editTodo({ 
+      variables: { id, input: { status: status === 0 ? 1 : 0 } }
+    });
+  }
+
+  /** 刪除彈窗 */
+  const handleClickOpen = (e = null, item) => {
+    e?.stopPropagation();
+    setnowDeleteData(item)
+    setDialogStatus(true)
+  };
+
+  /** 刪除todo */
+  const deleteTodoHandler = async () => {
+    try {
+      await deleteTodo({
+        variables: { id: nowDeleteData.id },
+        update: cache => {
+          const prevData = cache.readQuery({ query: GET_TODOS });
+          const newTodos = prevData.getTodos.filter(todo => todo.id !== nowDeleteData.id);
+          cache.writeQuery({ query: GET_TODOS, data: { getTodos: newTodos }});
+        }
+      })
+    } catch (error) {
+      console.log('error: ', error);
+    } finally {
+      setDialogStatus(false)
     }
   }
 
   return (
-    // <div style={{ 'backgroundColor' : '#2d2d2d'}}>
-    <div>
+    <div style={{ 'backgroundColor':'#2d2d2d' }}>
       <Head>
         <title>Todo List</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <div className='content'>
+      <Content>
         <Title> 
           TODO LIST
         </Title>
-        <br/>
         {
           loading ? <CircularProgress /> :
           <List>
-            {viewList.map((item,idx) => (
+            {getTodos.map((item,idx) => (
+              <div key={idx}>
                 <ListItem
                   disablePadding
-                  key={idx}
                   secondaryAction={
-                    <>
-                    <IconButton edge="end" onClick={() => itemClick(idx, 'edit', item.text)}>
-                      {
-                        item.isEdit ? <BackupIcon /> : <EditIcon />
-                      }
-                    </IconButton>
-                    <IconButton edge="end" onClick={() => itemClick(idx, 'delete')}>
+                    <IconButton edge="end" onClick={(e) => handleClickOpen(e, item)}>
                       <CloseIcon />
                     </IconButton>
-                    </>
                   }
+                  onClick={ () => editTodoHandler(item) }
               >
                   <ListItemButton >
                     <CheckIcon fill={ item.status === 0 ? '#61dafb': 'red'} />
-                    {item?.isEdit ? 
-                    <Input defaultValue={item.text} size="large" placeholder="please enter something..." /> 
-                    : <ListItemText
+                    <ListItemText
                       primary={item.text}
                       status={item.status}
-                    />}
+                    />
                     
                 </ListItemButton>
               </ListItem>
+              <Divider />
+              </div>
             ))}
 
           </List>
         }
         {/* input group */}
         <TextField size='small' placeholder='add a new todo...' value={inputValue} onChange={({ target:{ value } }) => setInputValue(value)} />
-        <Button variant="contained" onClick={ addItem } disabled={!inputValue} >
+        <CusButton variant="contained" onClick={ () => addTodoApi() } >
           Add
-        </Button>
-      </div>
-      <>
-      {
-        viewer.map(e => {
-          <div>
-            <p>Text: {e.Text}</p>
-            <p>status: {e.status}</p>
-          </div>
-        })
-      }
-      {
-        JSON.stringify(viewer)
-      }
-      </>
-
-      <Link href="/about">
-        <a>static</a>
-      </Link>{' '}
+        </CusButton>
+        {/* delete dialog */}
+        <Dialog 
+          open={dialogStatus}
+        >
+          <DialogTitle>
+            {`Delete ${nowDeleteData?.text} ?`}
+          </DialogTitle>
+          <DialogActions>
+            <Button onClick={()=> setDialogStatus(false)}>No</Button>
+            <Button onClick={deleteTodoHandler} autoFocus>
+              Yes
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Content>
     </div>
   )
 }
@@ -148,7 +132,7 @@ export async function getStaticProps() {
   const apolloClient = initializeApollo()
 
   await apolloClient.query({
-    query: ViewerQuery,
+    query: GET_TODOS,
   })
 
   return {

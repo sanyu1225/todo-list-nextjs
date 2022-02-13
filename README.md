@@ -1,8 +1,12 @@
-# Apollo Server and Client Example
+# Next.js Apollo Server and Client Example 
 
-[Apollo](https://www.apollographql.com/client/) is a GraphQL client that allows you to easily query the exact data you need from a GraphQL server. In addition to fetching and mutating data, Apollo analyzes your queries and their results to construct a client-side cache of your data, which is kept up to date as further queries and mutations are run.
+### 等待優化功能
+- debounce
+- 骨架屏
+- 完善例外處理
+- input欄位校驗
+- 無限滾動 or 分頁
 
-In this simple example, we integrate Apollo seamlessly with [Next.js data fetching methods](https://nextjs.org/docs/basic-features/data-fetching) to fetch queries in the server and hydrate them in the browser.
 
 ## Preview
 
