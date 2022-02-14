@@ -3,8 +3,7 @@ import { useApollo } from '../apollo/client'
 import { CssBaseline } from '@mui/material';
 
 export default function App({ Component, pageProps }) {
-  const apolloClient = useApollo(pageProps.initialApolloState)
-  console.log('apolloClient: ', apolloClient);
+  const apolloClient = useApollo()
 
   return (
     <ApolloProvider client={apolloClient}>

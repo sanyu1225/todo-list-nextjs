@@ -12,7 +12,7 @@ import DialogView from '../components/Dialog'
 import useRequest  from '../hooks/useRequest'
 const Index = () => {
 
-  const { loading, data: { getTodos } , error } = useQuery(GET_TODOS)
+  const { loading, data , error } = useQuery(GET_TODOS)
   // const [fetchData, { loading, data , error }] = useRequest(GET_TODOS)
   const [addTodo] = useMutation(ADD_TODO, {
     onCompleted: () => setInputValue('')
@@ -31,8 +31,8 @@ const Index = () => {
   // }, [])
   
   useEffect(() => {
-    console.log('getTodos data change', getTodos);
-  }, [getTodos])
+    console.log('getTodos data change', data?.getTodos);
+  }, [data])
   
 
   /** 新增一筆todos */
@@ -119,9 +119,9 @@ const Index = () => {
         </Title>
         {
           loading ? <CircularProgress /> :
-          !!getTodos?.length  &&
+          !!data?.getTodos?.length  &&
           <List>
-            {getTodos.map((item,idx) => (
+            {data?.getTodos.map((item,idx) => (
               <div key={idx}>
                 <ListItem
                   disablePadding
@@ -165,7 +165,7 @@ export async function getStaticProps() {
   await apolloClient.query({
     query: GET_TODOS,
   })
-
+  console.log('apolloClient.cache.extract()',apolloClient.cache.extract());
   return {
     props: {
       initialApolloState: apolloClient.cache.extract(),
