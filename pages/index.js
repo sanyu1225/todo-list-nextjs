@@ -27,7 +27,12 @@ const Index = () => {
 
   useEffect(() => {
     fetchData()
+    console.log('first get data');
   }, [])
+  
+  useEffect(() => {
+    console.log('data change', data);
+  }, [data])
   
 
   /** 新增一筆todos */
@@ -155,7 +160,7 @@ const Index = () => {
 
 export async function getStaticProps() {
   await connectDb()
-  
+
   const apolloClient = initializeApollo()
   await apolloClient.query({
     query: GET_TODOS,
