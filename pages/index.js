@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Button, ListItem, IconButton, ListItemButton, CircularProgress, Dialog, DialogTitle, DialogActions, Divider } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Title, Content, CheckIcon, ListItemText, List, TextField, CusButton } from '../styles'
-import { ADD_TODO, GET_TODOS, EDIT_TODOS, DELETE_TODO } from './api/todos';
+import { ADD_TODO, GET_TODOS, EDIT_TODOS, DELETE_TODO } from '../graphqlTodos/index';
 
 
 const Index = () => {

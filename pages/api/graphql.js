@@ -3,6 +3,7 @@ import { schema } from '../../apollo/schema'
 
 
 import connectDb from '../../db/config'
+
 connectDb()
 
 const apolloServer = new ApolloServer({ schema })
