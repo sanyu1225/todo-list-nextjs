@@ -34,6 +34,8 @@ export const List = styled(Lists)`
     background-color: #fff;
     border-radius: 5px;
     margin-bottom: 25px;
+    max-height: 530px;
+    overflow: auto;
 `
 
 /** input輸入欄 */

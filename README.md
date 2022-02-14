@@ -1,10 +1,7 @@
 # Next.js Apollo Server and Client Example 
 
 ### 等待優化功能
-- debounce
-- 骨架屏
-- 完善例外處理
-- input欄位校驗
+- 封裝全局loading效果 or 拆成button loading效果
 - 無限滾動 or 分頁
 
 
