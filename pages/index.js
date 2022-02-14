@@ -2,17 +2,18 @@ import Head from 'next/head'
 import { useQuery, useMutation } from '@apollo/client'
 import { initializeApollo } from '../apollo/client'
 import connectDb from '@/db/config';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ListItem, IconButton, ListItemButton, CircularProgress, Divider } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Title, Content, CheckIcon, ListItemText, List, TextField, CusButton } from '../styles'
 import { ADD_TODO, GET_TODOS, EDIT_TODOS, DELETE_TODO } from '../graphql/queries';
 import LoadingView from '../components/Loading'
 import DialogView from '../components/Dialog'
-
+import useRequest  from '../hooks/useRequest'
 const Index = () => {
 
-  const { loading, data: { getTodos } , error } = useQuery(GET_TODOS)
+  // const { loading, data: { getTodos } , error } = useQuery(GET_TODOS)
+  const [fetchData, { loading, data , error }] = useRequest(GET_TODOS)
   const [addTodo] = useMutation(ADD_TODO, {
     onCompleted: () => setInputValue('')
   })
@@ -24,6 +25,10 @@ const Index = () => {
   const [nowDeleteData, setnowDeleteData] = useState(null) // 待刪除資料
   const [loadingState, setLoadingState] = useState(false) // 全局loading
 
+  useEffect(() => {
+    fetchData()
+  }, [])
+  
 
   /** 新增一筆todos */
   const addTodoApi = async () => {
@@ -109,9 +114,9 @@ const Index = () => {
         </Title>
         {
           loading ? <CircularProgress /> :
-          !!getTodos?.length  &&
+          !!data?.getTodos?.length  &&
           <List>
-            {getTodos.map((item,idx) => (
+            {data.getTodos.map((item,idx) => (
               <div key={idx}>
                 <ListItem
                   disablePadding
@@ -150,6 +155,7 @@ const Index = () => {
 
 export async function getStaticProps() {
   await connectDb()
+  
   const apolloClient = initializeApollo()
   await apolloClient.query({
     query: GET_TODOS,
