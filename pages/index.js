@@ -12,8 +12,8 @@ import DialogView from '../components/Dialog'
 import useRequest  from '../hooks/useRequest'
 const Index = () => {
 
-  // const { loading, data: { getTodos } , error } = useQuery(GET_TODOS)
-  const [fetchData, { loading, data , error }] = useRequest(GET_TODOS)
+  const { loading, data: { getTodos } , error } = useQuery(GET_TODOS)
+  // const [fetchData, { loading, data , error }] = useRequest(GET_TODOS)
   const [addTodo] = useMutation(ADD_TODO, {
     onCompleted: () => setInputValue('')
   })
@@ -25,14 +25,14 @@ const Index = () => {
   const [nowDeleteData, setnowDeleteData] = useState(null) // 待刪除資料
   const [loadingState, setLoadingState] = useState(false) // 全局loading
 
-  useEffect(() => {
-    fetchData()
-    console.log('first get data');
-  }, [])
+  // useEffect(() => {
+  //   fetchData()
+  //   console.log('first get data');
+  // }, [])
   
   useEffect(() => {
-    console.log('data change', data);
-  }, [data])
+    console.log('getTodos data change', getTodos);
+  }, [getTodos])
   
 
   /** 新增一筆todos */
@@ -119,9 +119,9 @@ const Index = () => {
         </Title>
         {
           loading ? <CircularProgress /> :
-          !!data?.getTodos?.length  &&
+          !!getTodos?.length  &&
           <List>
-            {data.getTodos.map((item,idx) => (
+            {getTodos.map((item,idx) => (
               <div key={idx}>
                 <ListItem
                   disablePadding
