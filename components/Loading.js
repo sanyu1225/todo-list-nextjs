@@ -28,9 +28,11 @@ const LoadingIcon = styled(LoadingSvg)`
   }
   animation: lds-hourglass 2.2s infinite;
 `
-export default ({ visible }) => {
-     return visible && (
+const Loading = ({ visible }) => {
+     return visible ? (
         <LoadingWrap >
             <LoadingIcon />
-        </LoadingWrap>)
+        </LoadingWrap>) : <></>
 }
+
+export default Loading
