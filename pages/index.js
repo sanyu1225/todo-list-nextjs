@@ -1,12 +1,12 @@
-import gql from 'graphql-tag'
 import Head from 'next/head'
 import { useQuery, useMutation } from '@apollo/client'
 import { initializeApollo } from '../apollo/client'
+import connectDb from '@/db/config';
 import { useState } from 'react';
 import { Button, ListItem, IconButton, ListItemButton, CircularProgress, Dialog, DialogTitle, DialogActions, Divider } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Title, Content, CheckIcon, ListItemText, List, TextField, CusButton } from '../styles'
-import { ADD_TODO, GET_TODOS, EDIT_TODOS, DELETE_TODO } from '../graphqlTodos/index';
+import { ADD_TODO, GET_TODOS, EDIT_TODOS, DELETE_TODO } from '../graphql/queries';
 
 
 const Index = () => {
@@ -131,9 +131,8 @@ const Index = () => {
 }
 
 export async function getStaticProps() {
-  console.log('in-- getStaticProps: ');
+  await connectDb()
   const apolloClient = initializeApollo()
-
   await apolloClient.query({
     query: GET_TODOS,
   })
