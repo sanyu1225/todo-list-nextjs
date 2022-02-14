@@ -2,14 +2,14 @@ import Head from 'next/head'
 import { useQuery, useMutation } from '@apollo/client'
 import { initializeApollo } from '../apollo/client'
 import connectDb from '@/db/config';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ListItem, IconButton, ListItemButton, CircularProgress, Divider } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Title, Content, CheckIcon, ListItemText, List, TextField, CusButton } from '../styles'
 import { ADD_TODO, GET_TODOS, EDIT_TODOS, DELETE_TODO } from '../graphql/queries';
 import LoadingView from '../components/Loading'
 import DialogView from '../components/Dialog'
-import useRequest  from '../hooks/useRequest'
+// import useRequest  from '../hooks/useRequest'
 const Index = () => {
 
   const { loading, data , error } = useQuery(GET_TODOS)
@@ -24,16 +24,6 @@ const Index = () => {
   const [dialogStatus, setDialogStatus] = useState(false); // 刪除提示彈窗
   const [nowDeleteData, setnowDeleteData] = useState(null) // 待刪除資料
   const [loadingState, setLoadingState] = useState(false) // 全局loading
-
-  // useEffect(() => {
-  //   fetchData()
-  //   console.log('first get data');
-  // }, [])
-  
-  useEffect(() => {
-    console.log('getTodos data change', data?.getTodos);
-  }, [data])
-  
 
   /** 新增一筆todos */
   const addTodoApi = async () => {
@@ -165,7 +155,7 @@ export async function getStaticProps() {
   await apolloClient.query({
     query: GET_TODOS,
   })
-  console.log('apolloClient.cache.extract()',apolloClient.cache.extract());
+  
   return {
     props: {
       initialApolloState: apolloClient.cache.extract(),
