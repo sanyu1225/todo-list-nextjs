@@ -11,7 +11,7 @@ import { ADD_TODO, GET_TODOS, EDIT_TODOS, DELETE_TODO } from './api/todos';
 
 const Index = () => {
 
-  const { loading, data: { getTodos } } = useQuery(GET_TODOS)
+  const { loading, data: { getTodos } , error} = useQuery(GET_TODOS)
   const [addTodo] = useMutation(ADD_TODO, {
     onCompleted: () => setInputValue('')
   })
@@ -64,6 +64,7 @@ const Index = () => {
       setDialogStatus(false)
     }
   }
+  if(error) return <div>error</div>
 
   return (
     <div style={{ 'backgroundColor':'#2d2d2d' }}>
@@ -77,6 +78,7 @@ const Index = () => {
         </Title>
         {
           loading ? <CircularProgress /> :
+          !!getTodos?.length  &&
           <List>
             {getTodos.map((item,idx) => (
               <div key={idx}>
@@ -129,6 +131,7 @@ const Index = () => {
 }
 
 export async function getStaticProps() {
+  console.log('in-- getStaticProps: ');
   const apolloClient = initializeApollo()
 
   await apolloClient.query({
