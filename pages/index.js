@@ -26,7 +26,7 @@ const Index = () => {
   const [loadingState, setLoadingState] = useState(false) // 全局loading
 
   useEffect(() =>{
-    console.log('db',process.env.dbUrl);
+    console.log('db',process.env.DB_URL);
   },[] )
 
   /** 新增一筆todos */
