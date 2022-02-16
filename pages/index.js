@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useQuery, useMutation } from '@apollo/client'
 import { initializeApollo } from '../apollo/client'
 import connectDb from '@/db/config';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ListItem, IconButton, ListItemButton, CircularProgress, Divider } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Title, Content, CheckIcon, ListItemText, List, TextField, CusButton } from '../styles'
@@ -24,10 +24,6 @@ const Index = () => {
   const [dialogStatus, setDialogStatus] = useState(false); // 刪除提示彈窗
   const [nowDeleteData, setnowDeleteData] = useState(null) // 待刪除資料
   const [loadingState, setLoadingState] = useState(false) // 全局loading
-
-  useEffect(() =>{
-    console.log('db',process.env.DB_URL);
-  },[] )
 
   /** 新增一筆todos */
   const addTodoApi = async () => {
